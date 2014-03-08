@@ -8,13 +8,33 @@ class WordEntry {
 	public int[] location;
 }
 
-public class SuperWordSearch {
+class SuperWordSearch {
 
 	/* Generate transition matrix */
 
-	public void generateTransitionMatrix(char firstChar, String[] puzzle) {
+	public void generateTransitionMatrix(char firstChar, String[][] puzzle) {
 
-		
+		String[] possibleTransitionLetter = new String[100]; // Value needs to be changed
+		int[] letterLocation = new int[100]; // Value needs to be changed
+		int ctr = 0;
+		// if some letter is 1 away from firstChar, add it to possibleTransitionLetter[]
+		for (int i=0; i<puzzle.length; i++) {
+			for (int j=0; j<puzzle[i]; j++) {
+
+				if (letterLocation[i]-1 == i ||
+						letterLocation[i]+1 == i ||
+						letterLocation[j]-1 == j ||
+						letterLocation[j]+1 == j) {
+
+					possibleTransitionLetter[ctr] = puzzle[i][j];
+					ctr++;
+					System.out.println ("possibleTransitionLetter at "+ctr+" : "+possibleTransitionLetter[ctr]);
+				}
+
+			}
+		}
+
+
 
 	}
 
@@ -32,6 +52,7 @@ public class SuperWordSearch {
  			File file = new File(args[0]);
  			BufferedReader reader = new BufferedReader (new FileReader(file));
  			String line = null;
+ 			String[][] puzzle = new String[20][20]; // Value needs to be changed
  			int[] values = new int[10]; // this value needs to be changed
  			String[] words = new String[10]; // this value needs to be changed
  			int i = 0;
@@ -79,7 +100,7 @@ public class SuperWordSearch {
  					scan.next();
  				}
  			}
-
+ 			generateTransitionMatrix(words[0].charAt(0), );
 
 		}
 		catch (Exception e) {
