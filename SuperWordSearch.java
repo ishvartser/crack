@@ -18,7 +18,7 @@ class PuzzleInput {
 
 class SuperWordSearch {
 
-	/* Constants */
+	/* Constants & Globals */
 
 	final int[][] directions = new int[][] {{-1,-1},
 										   	{-1,0},
@@ -99,8 +99,6 @@ class SuperWordSearch {
 	boolean checkWord ()
 	{	
 		for (String s : possibleStrings) {
-			// System.out.println ("s: "+s);
-			// System.out.println ("Input.words @ QTY: "+input.words[input.wordBankQty-1]);
 			if (s.equals(input.words[input.whichWord])) {
 				System.out.println ("Woohoo! We found the word!");
 				return true;
@@ -108,6 +106,8 @@ class SuperWordSearch {
 		}
 		return false;
 	}
+
+	/* Collects input data and runs the program */
 
 	void run(String[] args) throws IOException 
 	{
@@ -118,11 +118,10 @@ class SuperWordSearch {
 		String line = null;
 		int i = 0;
 		int w = 0;
-		int whereWordsCtr = 0;
+		int whereWordsCtr = -1;
 		String wrapInfo = "";
 		boolean wrap;
 		int numCols;
-
 
 		// Extract matrix dimension & number of words (last entry)
 		Scanner scan = new Scanner(file);
@@ -143,25 +142,28 @@ class SuperWordSearch {
 		while ((line = reader.readLine()) != null) {
 			line = line.trim();
 			if (!line.equals("")) {
+				whereWordsCtr++;
 				numCols = 0;
 				// Get words from wordbank
-				if (whereWordsCtr > 5) { // (# of rows + 2)
+				if (whereWordsCtr > (values[0]+2)) { // (# of rows + 2)
 					System.out.println ("Word: " + line);
 					input.words[w] = line;
 					w++;
 				}
 				// Get puzzle from file
-				else if (whereWordsCtr > 0 && whereWordsCtr < 4) { // (>0, <#rows+1)
-					//System.out.println ("Puzzle: " + line);
+				else if ( (whereWordsCtr > 0) && (whereWordsCtr < (values[0]+1)) )  { // (>0, <#rows+1)
+					System.out.println ("Puzzle: " + line);
 					System.out.println ("Letters added...");
-					for (int a=0; a<puzzle.length; a++) {
+					// System.out.println ("Puzzle Length: "+puzzle.length);
+					// System.out.println ("whereWordsCtr: "+whereWordsCtr);
+					for (int a=0; a<line.length(); a++) {
+						// System.out.println ("a: "+a);
 						puzzle[whereWordsCtr-1][a] = line.charAt(a);
 						System.out.print(" " + puzzle[whereWordsCtr-1][a] + " ");
 						numCols++;
 					}
 					System.out.println ("");
 				}
-				whereWordsCtr++;
 				if (line.equals("WRAP")) {
 					wrap = true;
 					//System.out.println ("WrapTrue: " + wrap);
