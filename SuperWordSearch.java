@@ -8,11 +8,12 @@ class WordEntry {
 	public int[][] location;
 }
 
+// Defines various input arguments
 class PuzzleInput {
 	public String[] words;
 	public int x_dimension;
 	public int y_dimension;
-	public int wordBankQty;
+	public int whichWord;
 }
 
 class SuperWordSearch {
@@ -98,7 +99,9 @@ class SuperWordSearch {
 	boolean checkWord ()
 	{	
 		for (String s : possibleStrings) {
-			if (s.equals(input.words[0])) {
+			// System.out.println ("s: "+s);
+			// System.out.println ("Input.words @ QTY: "+input.words[input.wordBankQty-1]);
+			if (s.equals(input.words[input.whichWord])) {
 				System.out.println ("Woohoo! We found the word!");
 				return true;
 			}
@@ -110,9 +113,9 @@ class SuperWordSearch {
 	{
 		File file 			  	= new File(args[0]);
 		BufferedReader reader 	= new BufferedReader (new FileReader(file));
-		String line 		  	= null;
 		int[] values 			= new int[10];
 		input 					= new PuzzleInput();
+		String line = null;
 		int i = 0;
 		int w = 0;
 		int whereWordsCtr = 0;
@@ -170,7 +173,11 @@ class SuperWordSearch {
 			}
 		}
 		//System.out.println ("First word's 1st letter: "+ words[2].charAt(0));
-		generateTransitionMatrix(input.words[1].charAt(0), puzzle);
+		for (int x=0; x<input.words.length; x++) {
+			// We may want to empty the list possibleStrings after we finish with a letter
+			input.whichWord = x;
+			generateTransitionMatrix (input.words[x].charAt(0), puzzle);
+		}
 	}
 
 	public static void main (String[] args) throws IOException
