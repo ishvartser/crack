@@ -30,8 +30,7 @@ class SuperWordSearch {
 
 	List<String> possibleStrings = new ArrayList<String>();
 	PuzzleInput input;
-
-
+	char[][] puzzle;
 
 	/* Generate transition matrix */
 
@@ -83,7 +82,6 @@ class SuperWordSearch {
         return false;
 	}
 
-
 	/* Build all possible strings */
 
 	void buildPossibleStrings (String nextChar, char firstChar) 
@@ -108,28 +106,35 @@ class SuperWordSearch {
 		return false;
 	}
 
-
 	void run(String[] args) throws IOException 
 	{
-		File file = new File(args[0]);
-		BufferedReader reader = new BufferedReader (new FileReader(file));
-		String line = null;
-		char[][] puzzle = new char[3][3]; // Value needs to be changed
-		int[] values = new int[10]; // this value needs to be changed
-		//String[] words = new String[10]; // this value needs to be changed
-		input = new PuzzleInput();
-		input.words = new String[10]; // Value should be changed to the amount of words inputted
+		File file 			  	= new File(args[0]);
+		BufferedReader reader 	= new BufferedReader (new FileReader(file));
+		String line 		  	= null;
+		int[] values 			= new int[10];
+		input 					= new PuzzleInput();
 		int i = 0;
 		int w = 0;
 		int whereWordsCtr = 0;
 		String wrapInfo = "";
 		boolean wrap;
-
 		int numCols;
 
-		// WordEntry wordEntry = new WordEntry();
-		// wordEntry.letters = new String[12];
-		// wordEntry.location = new int[5][5];
+
+		// Extract matrix dimension & number of words (last entry)
+		Scanner scan = new Scanner(file);
+		while (scan.hasNext()) {
+			if (scan.hasNextInt()) {
+				values[i] = scan.nextInt();
+				puzzle = new char[values[0]][values[1]];
+				input.words = new String[values[2]];
+				System.out.println ("Value: " + values[i]);
+				i++;
+			}
+			else {
+				scan.next();
+			}
+		}
 
 		// Clean up input, get words, & read WRAP or NO_WRAP option
 		while ((line = reader.readLine()) != null) {
@@ -142,7 +147,6 @@ class SuperWordSearch {
 					input.words[w] = line;
 					w++;
 				}
-
 				// Get puzzle from file
 				else if (whereWordsCtr > 0 && whereWordsCtr < 4) { // (>0, <#rows+1)
 					//System.out.println ("Puzzle: " + line);
@@ -154,7 +158,6 @@ class SuperWordSearch {
 					}
 					System.out.println ("");
 				}
-
 				whereWordsCtr++;
 				if (line.equals("WRAP")) {
 					wrap = true;
@@ -166,23 +169,8 @@ class SuperWordSearch {
 				}
 			}
 		}
-
 		//System.out.println ("First word's 1st letter: "+ words[2].charAt(0));
 		generateTransitionMatrix(input.words[1].charAt(0), puzzle);
-
-		// Extract matrix dimension & number of words (last entry)
-		Scanner scan = new Scanner(file);
-		while (scan.hasNext()) {
-			if (scan.hasNextInt()) {
-				values[i] = scan.nextInt();
-				System.out.println ("Value: " + values[i]);
-				i++;
-			}
-			else {
-				scan.next();
-			}
-		}
-
 	}
 
 	public static void main (String[] args) throws IOException
