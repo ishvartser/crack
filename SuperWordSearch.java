@@ -47,14 +47,11 @@ class SuperWordSearch {
 				                possibleTransitions.add(puzzle[cy][cx]);
 				                System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
 				                System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
+				                
 				                // Continue on this direction to check out next possible letter
-				                int nextX = cx + direction[0];
-				                int nextY = cy + direction[1];
-				                if(nextY >=0 && nextY < puzzle.length) {
-						            if(nextX >= 0 && nextX < puzzle[cy].length){ 
-						            	System.out.println ("OH YEAH, Also added... "+puzzle[nextX][nextY]);
-						            }
-						        }
+				                if (findLetters(cx, cy, direction, puzzle)) {
+				                	// Start building possible strings
+				                }
 				            }
 				        }
 				    }
@@ -62,6 +59,21 @@ class SuperWordSearch {
 			}
 		}
 	}
+
+	/* Find all letters on the trajectory */
+
+	boolean findLetters (int cx, int cy, int[] direction, char[][] puzzle) {
+		int nextX = cx + direction[0];
+        int nextY = cy + direction[1];
+        if(nextY >=0 && nextY < puzzle.length) {
+            if(nextX >= 0 && nextX < puzzle[cy].length){ 
+            	System.out.println ("OH YEAH, Also added... "+puzzle[nextX][nextY]);
+            	return true;
+            }
+        }
+        return false;
+	}
+
 
 	/* Build all possible strings */
 
