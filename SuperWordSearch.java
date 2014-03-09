@@ -15,54 +15,77 @@ class PuzzleEntry {
 
 class SuperWordSearch {
 
+	/* Constants */
 
-	/* Retrieve location of letter in */
-
+	final int[][] directions = new int[][] {{-1,-1},
+										   	{-1,0},
+											{-1,1},
+											{0,1},
+											{1,1},
+											{1,0},
+											{1,-1},
+											{0,-1}};
 
 
 	/* Generate transition matrix */
 
-	// need to pass in location here, not the actual first character
 	void generateTransitionMatrix(char firstChar, char[][] puzzle) {
 
-		char[] possibleTransitionLetter = new char[100]; // Value needs to be changed
-		int[] letterLocation = new int[100]; // Value needs to be changed
-		int[][] directions = new int[][] { {-1,-1},
-												   {-1,0},
-												   {-1,1},
-												   {0,1},
-												   {1,1},
-												   {1,0},
-												   {1,-1},
-												   {0,-1} };
-		// if some letter is 1 away from firstChar, add it to possibleTransitionLetter[]
+		int[] letterLocation = new int[2];
+		// If some letter is 1 away from firstChar, add it to possibleTransitions list
 		for (int i=0; i<puzzle.length; i++) {
 			for (int j=0; j<puzzle[i].length; j++) {
 				if (firstChar == puzzle[i][j]) {
-					// get location of char, which are the current indices
 					letterLocation[0] = i;
 					letterLocation[1] = j;
-					List<Character> res = new ArrayList<Character>();
+					List<Character> possibleTransitions = new ArrayList<Character>();
 				    for (int[] direction : directions) {
 				        int cx = i + direction[0];
 				        int cy = j + direction[1];
 				        if(cy >=0 && cy < puzzle.length) {
 				            if(cx >= 0 && cx < puzzle[cy].length){
-				                res.add(puzzle[cy][cx]);
+				                possibleTransitions.add(puzzle[cy][cx]);
 				                System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
+				                System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
+				                // Continue on this direction to check out next possible letter
+				                int nextX = cx + direction[0];
+				                int nextY = cy + direction[1];
+				                if(nextY >=0 && nextY < puzzle.length) {
+						            if(nextX >= 0 && nextX < puzzle[cy].length){ 
+						            	System.out.println ("OH YEAH, Also added... "+puzzle[nextX][nextY]);
+						            }
+						        }
 				            }
 				        }
 				    }
 				}
 			}
 		}
-
-
-
 	}
 
-	// Build all possible strings
+	/* Build all possible strings */
 
+	void buildPossibleStrings (List<Character> possibleTransitions, char[][] puzzle, char firstChar, 
+														char surroundingLetter, int dirx, int diry) {
+
+		// Build strings by continuing in the given direction, if possible
+		// List<String> possibleStrings = new ArrayList<String>();
+
+		// // Can we continue on the given direction?
+		// if(diry >=0 && diry < puzzle.length) {
+  //           if(dirx >= 0 && dirx < puzzle[cy].length){
+  //               possibleTransitions.add(puzzle[cy][cx]);
+  //               System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
+  //               System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
+  //           }
+  //       }
+
+		// for (char c : possibleTransitions) {
+		// 	String stringToAdd = "" + firstChar + c;
+		// 	possibleStrings.add();
+		// }
+
+	}
 
 	// Check to see if one of possible strings match with word in wordbank
 
@@ -106,7 +129,6 @@ class SuperWordSearch {
 					System.out.println ("Letters added...");
 					for (int a=0; a<puzzle.length; a++) {
 						puzzle[whereWordsCtr-1][a] = line.charAt(a);
-
 						System.out.print(" " + puzzle[whereWordsCtr-1][a] + " ");
 						numCols++;
 					}
@@ -125,7 +147,7 @@ class SuperWordSearch {
 			}
 		}
 
-		System.out.println ("First word's 1st letter: "+ words[0].charAt(0));
+		//System.out.println ("First word's 1st letter: "+ words[2].charAt(0));
 		generateTransitionMatrix(words[0].charAt(0), puzzle);
 
 		// Extract matrix dimension & number of words (last entry)
