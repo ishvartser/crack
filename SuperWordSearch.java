@@ -26,6 +26,8 @@ class SuperWordSearch {
 											{1,-1},
 											{0,-1}};
 
+	List<String> possibleStrings = new ArrayList<String>();
+
 
 	/* Generate transition matrix */
 
@@ -38,19 +40,21 @@ class SuperWordSearch {
 				if (firstChar == puzzle[i][j]) {
 					letterLocation[0] = i;
 					letterLocation[1] = j;
-					List<Character> possibleTransitions = new ArrayList<Character>();
+					List<String> possibleTransitions = new ArrayList<String>();
 				    for (int[] direction : directions) {
 				        int cx = i + direction[0];
 				        int cy = j + direction[1];
 				        if(cy >=0 && cy < puzzle.length) {
 				            if(cx >= 0 && cx < puzzle[cy].length){
-				                possibleTransitions.add(puzzle[cy][cx]);
+				                possibleTransitions.add(Character.toString(puzzle[cy][cx]));
 				                System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
 				                System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
-				                
+				                buildPossibleStrings(Character.toString(puzzle[cx][cy]), firstChar);
 				                // Continue on this direction to check out next possible letter
 				                if (findLetters(cx, cy, direction, puzzle)) {
-				                	// Start building possible strings
+				                	possibleTransitions.add (""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy+direction[1]]);
+				                	//System.out.println( "Combo: "+""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy+direction[1]] );
+				                	buildPossibleStrings(""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy+direction[1]], firstChar);
 				                }
 				            }
 				        }
@@ -77,26 +81,11 @@ class SuperWordSearch {
 
 	/* Build all possible strings */
 
-	void buildPossibleStrings (List<Character> possibleTransitions, char[][] puzzle, char firstChar, 
-														char surroundingLetter, int dirx, int diry) {
-
+	void buildPossibleStrings (String nextChar, char firstChar) {
 		// Build strings by continuing in the given direction, if possible
-		// List<String> possibleStrings = new ArrayList<String>();
-
-		// // Can we continue on the given direction?
-		// if(diry >=0 && diry < puzzle.length) {
-  //           if(dirx >= 0 && dirx < puzzle[cy].length){
-  //               possibleTransitions.add(puzzle[cy][cx]);
-  //               System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
-  //               System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
-  //           }
-  //       }
-
-		// for (char c : possibleTransitions) {
-		// 	String stringToAdd = "" + firstChar + c;
-		// 	possibleStrings.add();
-		// }
-
+		String stringToAdd = "" + firstChar + nextChar;
+		possibleStrings.add(stringToAdd);
+		System.out.println ("Possible string: "+stringToAdd);
 	}
 
 	// Check to see if one of possible strings match with word in wordbank
