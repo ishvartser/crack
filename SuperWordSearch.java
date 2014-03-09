@@ -8,9 +8,11 @@ class WordEntry {
 	public int[][] location;
 }
 
-class PuzzleEntry {
-	public String[] letters;
-	public int[] location;
+class PuzzleInput {
+	public String[] words;
+	public int x_dimension;
+	public int y_dimension;
+	public int wordBankQty;
 }
 
 class SuperWordSearch {
@@ -27,12 +29,14 @@ class SuperWordSearch {
 											{0,-1}};
 
 	List<String> possibleStrings = new ArrayList<String>();
+	PuzzleInput input;
+
 
 
 	/* Generate transition matrix */
 
-	void generateTransitionMatrix(char firstChar, char[][] puzzle) {
-
+	void generateTransitionMatrix(char firstChar, char[][] puzzle) 
+	{
 		int[] letterLocation = new int[2];
 		// If some letter is 1 away from firstChar, add it to possibleTransitions list
 		for (int i=0; i<puzzle.length; i++) {
@@ -47,8 +51,8 @@ class SuperWordSearch {
 				        if(cy >=0 && cy < puzzle.length) {
 				            if(cx >= 0 && cx < puzzle[cy].length){
 				                possibleTransitions.add(Character.toString(puzzle[cy][cx]));
-				                System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
-				                System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
+				                //System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
+				                //System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
 				                buildPossibleStrings(Character.toString(puzzle[cx][cy]), firstChar);
 				                // Continue on this direction to check out next possible letter
 				                if (findLetters(cx, cy, direction, puzzle)) {
@@ -66,12 +70,13 @@ class SuperWordSearch {
 
 	/* Find all letters on the trajectory */
 
-	boolean findLetters (int cx, int cy, int[] direction, char[][] puzzle) {
+	boolean findLetters (int cx, int cy, int[] direction, char[][] puzzle) 
+	{
 		int nextX = cx + direction[0];
         int nextY = cy + direction[1];
         if(nextY >=0 && nextY < puzzle.length) {
             if(nextX >= 0 && nextX < puzzle[cy].length){ 
-            	System.out.println ("OH YEAH, Also added... "+puzzle[nextX][nextY]);
+            	//System.out.println ("OH YEAH, Also added... "+puzzle[nextX][nextY]);
             	return true;
             }
         }
@@ -81,25 +86,39 @@ class SuperWordSearch {
 
 	/* Build all possible strings */
 
-	void buildPossibleStrings (String nextChar, char firstChar) {
+	void buildPossibleStrings (String nextChar, char firstChar) 
+	{
 		// Build strings by continuing in the given direction, if possible
 		String stringToAdd = "" + firstChar + nextChar;
 		possibleStrings.add(stringToAdd);
+		checkWord();
 		System.out.println ("Possible string: "+stringToAdd);
 	}
 
-	// Check to see if one of possible strings match with word in wordbank
+	/* Check to see if one of possible strings match with word in wordbank */
+
+	boolean checkWord ()
+	{	
+		for (String s : possibleStrings) {
+			if (s.equals(input.words[0])) {
+				System.out.println ("Woohoo! We found the word!");
+				return true;
+			}
+		}
+		return false;
+	}
 
 
-
-	void run(String[] args) throws IOException {
-
+	void run(String[] args) throws IOException 
+	{
 		File file = new File(args[0]);
 		BufferedReader reader = new BufferedReader (new FileReader(file));
 		String line = null;
 		char[][] puzzle = new char[3][3]; // Value needs to be changed
 		int[] values = new int[10]; // this value needs to be changed
-		String[] words = new String[10]; // this value needs to be changed
+		//String[] words = new String[10]; // this value needs to be changed
+		input = new PuzzleInput();
+		input.words = new String[10]; // Value should be changed to the amount of words inputted
 		int i = 0;
 		int w = 0;
 		int whereWordsCtr = 0;
@@ -108,9 +127,9 @@ class SuperWordSearch {
 
 		int numCols;
 
-		WordEntry wordEntry = new WordEntry();
-		wordEntry.letters = new String[12];
-		wordEntry.location = new int[5][5];
+		// WordEntry wordEntry = new WordEntry();
+		// wordEntry.letters = new String[12];
+		// wordEntry.location = new int[5][5];
 
 		// Clean up input, get words, & read WRAP or NO_WRAP option
 		while ((line = reader.readLine()) != null) {
@@ -120,7 +139,7 @@ class SuperWordSearch {
 				// Get words from wordbank
 				if (whereWordsCtr > 5) { // (# of rows + 2)
 					System.out.println ("Word: " + line);
-					words[w] = line;
+					input.words[w] = line;
 					w++;
 				}
 
@@ -149,7 +168,7 @@ class SuperWordSearch {
 		}
 
 		//System.out.println ("First word's 1st letter: "+ words[2].charAt(0));
-		generateTransitionMatrix(words[0].charAt(0), puzzle);
+		generateTransitionMatrix(input.words[1].charAt(0), puzzle);
 
 		// Extract matrix dimension & number of words (last entry)
 		Scanner scan = new Scanner(file);
@@ -166,7 +185,8 @@ class SuperWordSearch {
 
 	}
 
-	public static void main (String[] args) throws IOException{
+	public static void main (String[] args) throws IOException
+	{
 		new SuperWordSearch().run(args);
 	}
 
