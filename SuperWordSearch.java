@@ -44,13 +44,25 @@ class SuperWordSearch {
 				if (firstChar == puzzle[i][j]) {
 					letterLocation[0] = i;
 					letterLocation[1] = j;
+					System.out.println ("i: "+i+" "+" j: "+j);
 					List<String> possibleTransitions = new ArrayList<String>();
 				    for (int[] direction : directions) {
 				        int cx = i + direction[0];
 				        int cy = j + direction[1];
+				        // System.out.println ("dir[0]: "+direction[0]+" "+" dir[1]: "+direction[1]);
+				        // System.out.println ("cx: "+cx+" "+" cy: "+cy);
+				        // System.out.println ("puzzle.length"+puzzle.length);
+				        // System.out.println ("puzzle.length[cy]"+puzzle[cy].length);
+				        if (cx >= puzzle.length) {
+				        	cx--;
+				        }
+				        if (cy >= puzzle[cy].length) {
+				        	cy--;
+				        }
+
 				        if(cy >=0 && cy < puzzle.length) {
 				            if(cx >= 0 && cx < puzzle[cy].length){
-				                possibleTransitions.add(Character.toString(puzzle[cy][cx]));
+				                possibleTransitions.add(Character.toString(puzzle[cx][cy]));
 				                //System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
 				                //System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
 				                buildPossibleStrings(Character.toString(puzzle[cx][cy]), firstChar);
@@ -154,10 +166,7 @@ class SuperWordSearch {
 				else if ( (whereWordsCtr > 0) && (whereWordsCtr < (values[0]+1)) )  { // (>0, <#rows+1)
 					System.out.println ("Puzzle: " + line);
 					System.out.println ("Letters added...");
-					// System.out.println ("Puzzle Length: "+puzzle.length);
-					// System.out.println ("whereWordsCtr: "+whereWordsCtr);
 					for (int a=0; a<line.length(); a++) {
-						// System.out.println ("a: "+a);
 						puzzle[whereWordsCtr-1][a] = line.charAt(a);
 						System.out.print(" " + puzzle[whereWordsCtr-1][a] + " ");
 						numCols++;
