@@ -40,15 +40,20 @@ class SuperWordSearch {
 		int[] letterLocation = new int[2];
 		boolean nbymMatrix_X = false;
 		boolean nbymMatrix_Y = false;
+		boolean nbymMatrix = false;
 		// If some letter is 1 away from firstChar, add it to possibleTransitions list
 		for (int i=0; i<puzzle.length; i++) {
 			for (int j=0; j<puzzle[i].length; j++) {
 				if (firstChar == puzzle[i][j]) {
 					letterLocation[0] = i;
 					letterLocation[1] = j;
-					// System.out.println ("i: "+i+" "+" j: "+j);
+					System.out.println ("i: "+i+" "+" j: "+j);
 					List<String> possibleTransitions = new ArrayList<String>();
 				    for (int[] direction : directions) {
+
+				    	// System.out.println ("puzzle-length-row : "+puzzle.length);
+				    	// System.out.println ("puzzle-length-col : "+puzzle[i].length);
+
 				        int cx = i + direction[0];
 				        int cy = j + direction[1];
 				        if (cx < 0) {
@@ -58,30 +63,23 @@ class SuperWordSearch {
 				        	cy++;
 				        }
 				        // System.out.println ("dir[0]: "+direction[0]+" "+" dir[1]: "+direction[1]);
-				        //System.out.println ("cx: "+cx+" "+" cy: "+cy);
-				        // System.out.println ("puzzle.length"+puzzle.length);
-				        // System.out.println ("puzzle.length[cy]"+puzzle[cy].length);
-
-				        /*This screws up running on test1*/
-
-				        // if (cx >= puzzle.length) {
-				        // 	cx--;
-				        // 	// System.out.println ("cx after decrement: "+cx);
-				        // 	nbymMatrix_X = true;
-				        // }
-				        // if (cy >= puzzle[cy].length) {
-				        // 	cy--;
-				        // 	// System.out.println ("cy after decrement: "+cy);
-				        // 	nbymMatrix_Y = true;
-				        // }
+				        // System.out.println ("cx: "+cx+" "+" cy: "+cy);
+				        // System.out.println ("puzzle.length (ROWS) "+puzzle.length);
+				        // System.out.println ("puzzle.length[i] (COLS) "+puzzle[i].length);
 				        
-				        // if(cy >=0 && cy < puzzle.length) {
-				        if(cy >=0 && cy < puzzle.length - (puzzle.length - puzzle[cy].length) ) {
+				        // calculate difference and add to puzzle.length?
+
+				        /* IF NxM matrix, N<M */
+				        if (puzzle.length <= puzzle[i].length) {
+
+				         if(cy >=0 && cy < puzzle.length) {
+				        // if(cy >=0 && cy < puzzle.length - Math.abs(puzzle.length - puzzle[i].length) ) {
 				        	// System.out.println ("cy after FIRSTCHECK: "+cy);
-				            if(cx >= 0 && cx < puzzle[cy].length){
-				            	//System.out.println ("cx after SECONDCHECK: "+cy);
+				            if(cx >= 0 && cx < puzzle[cy].length - Math.abs(puzzle.length - puzzle[i].length) ){
+				            	// cy = (cy - Math.abs(puzzle.length - puzzle[cy].length));
+				            	//System.out.println ("cx < : " + (puzzle[cy].length - Math.abs(puzzle.length - puzzle[cy].length)));
+				                // System.out.println("Adding surrounding letter... " + puzzle[cx][cy]);
 				                possibleTransitions.add(Character.toString(puzzle[cx][cy]));
-				                //System.out.println("Added surrounding letter... " + puzzle[cx][cy]);
 				                //System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
 				                buildPossibleStrings(Character.toString(puzzle[cx][cy]), firstChar);
 				                // Continue on this direction to check out next possible letter
@@ -120,6 +118,62 @@ class SuperWordSearch {
 				                }
 				            }
 				        }
+						} else {
+
+						// if(cy >=0 && cy < puzzle.length) {
+				        if(cy >=0 && cy < puzzle.length - Math.abs(puzzle.length - puzzle[i].length) ) {
+				        	// System.out.println ("cy after FIRSTCHECK: "+cy);
+				            if(cx >= 0 && cx < puzzle[cy].length){// - Math.abs(puzzle.length - puzzle[i].length) ){
+				            	// cy = (cy - Math.abs(puzzle.length - puzzle[cy].length));
+				            	//System.out.println ("cx < : " + (puzzle[cy].length - Math.abs(puzzle.length - puzzle[cy].length)));
+				                // System.out.println("Adding surrounding letter... " + puzzle[cx][cy]);
+				                possibleTransitions.add(Character.toString(puzzle[cx][cy]));
+				                //System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
+				                buildPossibleStrings(Character.toString(puzzle[cx][cy]), firstChar);
+				                // Continue on this direction to check out next possible letter
+				                if (findLetters(cx, cy, direction, puzzle)) {
+				                	// correct for out of bounds
+				                	if (nbymMatrix_X) {
+				                		possibleTransitions.add (""+puzzle[cx][cy]);
+				                			//+puzzle[cx+direction[0]][cy+direction[1]]);
+				                		// System.out.println( "NbyM Combo: "+""+puzzle[cx][cy]);
+				                			//+puzzle[cx+direction[0]][cy+direction[1]] );
+										buildPossibleStrings(""+puzzle[cx][cy]+puzzle[cx][cy+direction[1]], firstChar);
+									}
+									else if (nbymMatrix_Y) {
+				                		possibleTransitions.add (""+puzzle[cx][cy]);
+				                			//+puzzle[cx+direction[0]][cy+direction[1]]);
+				                		// System.out.println( "NbyM Combo: "+""+puzzle[cx][cy]);
+				                			//+puzzle[cx+direction[0]][cy+direction[1]] );
+										buildPossibleStrings(""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy], firstChar);	
+									}
+				                	else {
+				                		if ((cx+direction[0]) >= puzzle.length) {
+								        	cx--;
+								        	// System.out.println ("cx after decrement: "+cx);
+								        	nbymMatrix_X = true;
+								        }
+								        if ((cy+direction[1]) >= puzzle[cy].length) {
+								        	cy--;
+								        //	System.out.println ("cy after decrement: "+cy);
+								        	nbymMatrix_Y = true;
+								        }
+				                		//System.out.println ("possibleTransitionStuff: "+puzzle[cx][cy]);//+" & "+ puzzle[cx+direction[0]][cy+direction[1]]);
+				                		possibleTransitions.add (""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy+direction[1]]);
+				                		//System.out.println( "Combo: "+""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy+direction[1]] );
+				                		buildPossibleStrings(""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy+direction[1]], firstChar);
+				                	}
+				                }
+				            }
+				        }
+
+
+
+						}
+
+
+
+
 				    }
 				}
 			}
