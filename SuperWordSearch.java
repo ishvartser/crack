@@ -33,9 +33,45 @@ class SuperWordSearch {
 	PuzzleInput input;
 	char[][] puzzle;
 
+	/* Generate wrapping transition matrix */
+
+	void generateWrapTransitionMatrix (char firstChar, char[][] puzzle) {
+
+		// This will have to use modulo
+		for (int i=0; i<puzzle.length; i++) {
+			for (int j=0; j<puzzle[i].length; j++) {
+				if (firstChar == puzzle[i][j]) {
+					letterLocation[0] = i;
+					letterLocation[1] = j;
+					System.out.println ("i: "+i+" "+" j: "+j);
+					List<String> possibleTransitions = new ArrayList<String>();
+
+					for (int[] direction : directions) {
+
+						int cx = (i + direction[0]) % puzzle.length;
+				        int cy = (j + direction[1]) % puzzle[i].length;
+
+						possibleTransitions.add(Character.toString(puzzle[cx][cy]));
+		                System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
+		                buildPossibleStrings(Character.toString(puzzle[cx][cy]), firstChar, possibleStrings.size());
+				        System.out.println ("Added : "+(firstChar+puzzle[cx][cy]));
+
+				        
+
+
+					}
+				}
+
+
+
+			}
+		}
+
+	}
+
 	/* Generate transition matrix */
 
-	void generateTransitionMatrix(char firstChar, char[][] puzzle) 
+	void generateTransitionMatrix (char firstChar, char[][] puzzle) 
 	{
 		int[] letterLocation = new int[2];
 		boolean nbymMatrix_X = false;
@@ -67,7 +103,6 @@ class SuperWordSearch {
 				        // System.out.println ("puzzle.length (ROWS) "+puzzle.length);
 				        // System.out.println ("puzzle.length[cy] (COLS) "+puzzle[i].length);
 				        
-						// If the matrix is taller than it is wide
 				        if(cx >=0 && cx < puzzle.length) { // - Math.abs(puzzle.length - puzzle[i].length) ) {
 				        	// System.out.println ("cy after FIRSTCHECK: "+cy);
 				            if(cy >= 0 && cy < puzzle[i].length){// - Math.abs(puzzle.length - puzzle[i].length) ){
@@ -84,7 +119,7 @@ class SuperWordSearch {
 				                int nearCy = cy;
 				                for (int c=0; c<puzzle.length; c++) { 
 				                	// System.out.println ("index: "+c);
-					                if (findLettersTall(nearCx, nearCy, direction, puzzle)) {
+					                if (findLetters(nearCx, nearCy, direction, puzzle)) {
 					                	// correct for out of bounds
 										if ((cx+direction[0]) >= puzzle.length) {
 								        	cx--;
@@ -134,23 +169,9 @@ class SuperWordSearch {
 		}
 	}
 
-	boolean findLettersWide (int cx, int cy, int[] direction, char[][] puzzle) 
-	{
-		int nextX = cx + direction[0];
-        int nextY = cy + direction[1];
-        if(nextY >=0 && nextY < puzzle.length) {
-            if(nextX >= 0 && nextX < puzzle[cy].length - Math.abs(puzzle.length - puzzle[cy].length)){ 
-            	System.out.println ("FindLettersWide -> nextX "+nextX);
-            	System.out.println ("FindLettersWide -> nextY "+nextY);
-            	return true;
-            }
-        }
-        return false;
-	}
-
 	/* Find all letters on the trajectory */
 
-	boolean findLettersTall (int cx, int cy, int[] direction, char[][] puzzle) 
+	boolean findLetters (int cx, int cy, int[] direction, char[][] puzzle) 
 	{
 		int nextX = cx + direction[0];
         int nextY = cy + direction[1];
@@ -278,11 +299,11 @@ class SuperWordSearch {
 				}
 				if (line.equals("WRAP")) {
 					wrap = true;
-					//System.out.println ("WrapTrue: " + wrap);
+					System.out.println ("WrapTrue: " + wrap);
 				}
 				if (line.equals("NO_WRAP")) {
 					wrap = false;
-					//System.out.println ("WrapFalse: " + wrap);
+					System.out.println ("WrapFalse: " + wrap);
 				}
 			}
 		}
@@ -290,7 +311,12 @@ class SuperWordSearch {
 		for (int x=0; x<input.words.length; x++) {
 			// We may want to empty the list possibleStrings after we finish with a letter
 			input.whichWord = x;
-			generateTransitionMatrix (input.words[x].charAt(0), puzzle);
+			if (wrap == false) {
+				generateTransitionMatrix (input.words[x].charAt(0), puzzle);
+			}
+			else {
+				generateWrapTransitionMatrix (input.words[x].charAt(0), puzzle);
+			}
 		}
 	}
 
