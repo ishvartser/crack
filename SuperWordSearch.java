@@ -54,8 +54,8 @@ class SuperWordSearch {
 
 					for (int[] direction : directions) {
 
-						int cx = Math.abs((i + direction[0]) % puzzle.length);
-				        int cy = Math.abs((j + direction[1]) % puzzle[i].length);
+						int cx = (i + direction[0]) % puzzle.length;
+				        int cy = (j + direction[1]) % puzzle[i].length;
 				        System.out.println ("cx - post modulo: " + cx);
 				        System.out.println ("cy - post modulo: " + cy);
 				        if (cx < 0) {
@@ -74,18 +74,18 @@ class SuperWordSearch {
 				        int nearCxItor = cx;
 		                int nearCyItor = cy;
 				        for (int c=0; c<(3*puzzle.length); c++) { 
-			                // if (findLetters(nearCx, nearCy, direction, puzzle)) {
+			                if (findWrapLetters(nearCx, nearCy, direction, puzzle)) {
 			                	// correct for out of bounds
-								if ((cx+direction[0]) >= puzzle.length) {
-						        	cx--;
-						        	nbymMatrix_X = true;
-						        	System.out.println ("Decrementing cx...");
-						        }
-						        if ((cy+direction[1]) >= puzzle[i].length) {
-						        	cy--;
-						        	nbymMatrix_Y = true;
-						        	System.out.println ("Decrementing cy...");
-						        }
+								// if ((cx+direction[0]) >= puzzle.length) {
+						  //       	cx--;
+						  //       	nbymMatrix_X = true;
+						  //       	System.out.println ("Decrementing cx...");
+						  //       }
+						  //       if ((cy+direction[1]) >= puzzle[i].length) {
+						  //       	cy--;
+						  //       	nbymMatrix_Y = true;
+						  //       	System.out.println ("Decrementing cy...");
+						  //       }
 
 			                	if (nbymMatrix_X) {
 			                		nearCy = (cy+direction[1]) % puzzle[i].length;
@@ -100,18 +100,20 @@ class SuperWordSearch {
 									buildPossibleStrings(""+puzzle[cx][cy]+puzzle[nearCx][cy], firstChar, c);	
 								}
 			                	else {
-			                		nearCx = Math.abs((nearCxItor+direction[0]) % puzzle.length);
-			                		nearCy = Math.abs((nearCyItor+direction[1]) % puzzle[i].length);
+			                		nearCx = (cx+direction[0]) % puzzle.length;
+			                		nearCy = (cy+direction[1]) % puzzle[i].length;
 			                		System.out.println ("nearCx: "+nearCx);
 			                		System.out.println ("nearCy: "+nearCy);
 			                		// possibleTransitions.add (""+puzzle[nearCx][nearCy]+puzzle[nearCx+direction[0]][nearCy+direction[1]]);
 			                		// buildPossibleStrings(""+puzzle[nearCx+direction[0]][nearCy+direction[1]], firstChar, c);
-			                		possibleTransitions.add (""+puzzle[nearCxItor][nearCyItor]+puzzle[nearCx][nearCy]);
+			                		possibleTransitions.add (""+puzzle[cx][cy]+puzzle[nearCx][nearCy]);
 			                		buildPossibleStrings(""+puzzle[nearCx][nearCy], firstChar, c);
-									nearCx = nearCx + direction[0];
-									nearCy = nearCy + direction[1];
+			                		// nearCx = Math.abs((cx+direction[0]) % puzzle.length);
+			                		// nearCy = Math.abs((cy+direction[1]) % puzzle[i].length);
+									cx = nearCx;
+									cy = nearCy;
 			                	}
-			                // }
+			                }
 			         	}
 			            possibleStrings.clear();
 					}
@@ -244,28 +246,52 @@ class SuperWordSearch {
         return false;
 	}
 
+	boolean findWrapLetters (int cx, int cy, int[] direction, char[][] puzzle) 
+	{
+		int i=1;
+		int nextX = (cx + direction[0])%puzzle.length;
+        int nextY = (cy + direction[1])%puzzle[i].length;
+     //    System.out.println ("FindLettersTall -> nextX "+nextX);
+    	// System.out.println ("FindLettersTall -> nextY "+nextY);
+    	// System.out.println ("puzzle.length - Math.abs(puzzle.length - puzzle[cy].length): " + (puzzle.length - Math.abs(puzzle.length - puzzle[cy].length)));
+    	// System.out.println ("puzzle[cy].length: "+puzzle[cy].length);
+        // if ( (nextX >= 0 && nextX < puzzle[cy].length)
+        	// && (nextY >= 0 && nextY < puzzle.length) ) {
+	        if(nextX >=0 && nextX < puzzle.length) { // - Math.abs(puzzle.length - puzzle[cy].length) ) {
+	            if(nextY >= 0 && nextY < puzzle[i].length){ 
+	            	// System.out.println ("FindLettersTall -> puzzle[i].length "+puzzle[i].length);
+	            	// System.out.println ("FindLettersTall -> cy "+cy);
+	            	return true;
+	            }
+	        }
+	    // }
+        return false;
+	}
+
+
 	/* Build all possible strings */
 
 	void buildPossibleStrings (String nextChar, char firstChar, int whichStringCtr) 
 	{
 		// Build strings by continuing in the given direction, if possible
 		String stringToAdd;
-		// System.out.println ("whichStringCtr: "+whichStringCtr);
-		// System.out.println ("possibleStrings size: "+possibleStrings.size());
-		// System.out.println ("firstChar: "+firstChar);
+		System.out.println ("whichStringCtr: "+whichStringCtr);
+		System.out.println ("possibleStrings size: "+possibleStrings.size());
+		System.out.println ("firstChar: "+firstChar);
+		System.out.println ("nextChar: "+nextChar);
 
 		// if possibleStrings arraylist is empty, just add the first character
 		if (possibleStrings.isEmpty() ) {
 			stringToAdd = "" + firstChar + nextChar;
 			possibleStrings.add(stringToAdd);
-			// System.out.println("case2");
+			System.out.println("case1");
 			checkWord();
 		}
 		else if (whichStringCtr > possibleStrings.size()) {
 			
 			stringToAdd = "" + firstChar + nextChar;
 			//possibleStrings.add(stringToAdd);
-			// System.out.println("case1");
+			System.out.println("case2");
 			checkWord();
 		}
 		else {
@@ -274,8 +300,8 @@ class SuperWordSearch {
 			if (possibleStrings.size() == whichStringCtr) whichStringCtr--;
 			stringToAdd = "" + possibleStrings.get(whichStringCtr) + nextChar;
 			possibleStrings.add(stringToAdd);
-			// System.out.println ("*** before adding next string: "+possibleStrings.get(whichStringCtr));
-			// System.out.println("case3");
+			System.out.println ("*** before adding next string: "+possibleStrings.get(whichStringCtr));
+			System.out.println("case3");
 			checkWord();
 		}
 		System.out.println ("/// Possible string /// : "+stringToAdd);
