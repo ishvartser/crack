@@ -37,6 +37,12 @@ class SuperWordSearch {
 
 	void generateWrapTransitionMatrix (char firstChar, char[][] puzzle) {
 
+		System.out.println ("Wrap Function ON");
+		int[] letterLocation = new int[2];
+		boolean nbymMatrix_X = false;
+		boolean nbymMatrix_Y = false;
+		boolean nbymMatrix = false;
+
 		// This will have to use modulo
 		for (int i=0; i<puzzle.length; i++) {
 			for (int j=0; j<puzzle[i].length; j++) {
@@ -48,25 +54,70 @@ class SuperWordSearch {
 
 					for (int[] direction : directions) {
 
-						int cx = (i + direction[0]) % puzzle.length;
-				        int cy = (j + direction[1]) % puzzle[i].length;
+						int cx = Math.abs((i + direction[0]) % puzzle.length);
+				        int cy = Math.abs((j + direction[1]) % puzzle[i].length);
+				        System.out.println ("cx - post modulo: " + cx);
+				        System.out.println ("cy - post modulo: " + cy);
+				        if (cx < 0) {
+				        	cx++;
+				        }
+				        if (cy < 0) {
+				        	cy++;
+				        }
 
 						possibleTransitions.add(Character.toString(puzzle[cx][cy]));
 		                System.out.println("Direction[0]... " + direction[0] + "   Direction[1]... " + direction[1]);
 		                buildPossibleStrings(Character.toString(puzzle[cx][cy]), firstChar, possibleStrings.size());
-				        System.out.println ("Added : "+(firstChar+puzzle[cx][cy]));
+				        System.out.println ("Added : "+puzzle[cx][cy]);
+		                int nearCy=0;
+		                int nearCx=0;
+				        int nearCxItor = cx;
+		                int nearCyItor = cy;
+				        for (int c=0; c<(3*puzzle.length); c++) { 
+			                // if (findLetters(nearCx, nearCy, direction, puzzle)) {
+			                	// correct for out of bounds
+								if ((cx+direction[0]) >= puzzle.length) {
+						        	cx--;
+						        	nbymMatrix_X = true;
+						        	System.out.println ("Decrementing cx...");
+						        }
+						        if ((cy+direction[1]) >= puzzle[i].length) {
+						        	cy--;
+						        	nbymMatrix_Y = true;
+						        	System.out.println ("Decrementing cy...");
+						        }
 
-				        
-
-
+			                	if (nbymMatrix_X) {
+			                		nearCy = (cy+direction[1]) % puzzle[i].length;
+			                		possibleTransitions.add (""+puzzle[cx][cy]);
+									// buildPossibleStrings(""+puzzle[cx][cy]+puzzle[cx][cy+direction[1]], firstChar, c);
+									buildPossibleStrings(""+puzzle[cx][cy]+puzzle[cx][nearCy], firstChar, c);
+								}
+								else if (nbymMatrix_Y) {
+									nearCx = (cx+direction[0]) % puzzle.length;
+			                		possibleTransitions.add (""+puzzle[cx][cy]);
+									// buildPossibleStrings(""+puzzle[cx][cy]+puzzle[cx+direction[0]][cy], firstChar, c);
+									buildPossibleStrings(""+puzzle[cx][cy]+puzzle[nearCx][cy], firstChar, c);	
+								}
+			                	else {
+			                		nearCx = Math.abs((nearCxItor+direction[0]) % puzzle.length);
+			                		nearCy = Math.abs((nearCyItor+direction[1]) % puzzle[i].length);
+			                		System.out.println ("nearCx: "+nearCx);
+			                		System.out.println ("nearCy: "+nearCy);
+			                		// possibleTransitions.add (""+puzzle[nearCx][nearCy]+puzzle[nearCx+direction[0]][nearCy+direction[1]]);
+			                		// buildPossibleStrings(""+puzzle[nearCx+direction[0]][nearCy+direction[1]], firstChar, c);
+			                		possibleTransitions.add (""+puzzle[nearCxItor][nearCyItor]+puzzle[nearCx][nearCy]);
+			                		buildPossibleStrings(""+puzzle[nearCx][nearCy], firstChar, c);
+									nearCx = nearCx + direction[0];
+									nearCy = nearCy + direction[1];
+			                	}
+			                // }
+			         	}
+			            possibleStrings.clear();
 					}
 				}
-
-
-
 			}
 		}
-
 	}
 
 	/* Generate transition matrix */
@@ -256,7 +307,7 @@ class SuperWordSearch {
 		int w = 0;
 		int whereWordsCtr = -1;
 		String wrapInfo = "";
-		boolean wrap;
+		boolean wrap = false;
 		int numCols;
 
 		// Extract matrix dimension & number of words (last entry)
